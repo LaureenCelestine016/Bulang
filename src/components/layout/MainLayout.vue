@@ -1,7 +1,5 @@
 <template>
   <div class="flex">
-    <Sidebar />
-
     <div
       class="flex-1 bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#020617] text-white min-h-screen"
     >

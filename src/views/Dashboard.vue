@@ -4,10 +4,10 @@
     <Toast />
 
     <!-- HEADER -->
-    <h1 class="text-2xl font-semibold mb-6">Game Controller Dashboard</h1>
+    <h1 class="text-2xl font-semibold mb-2">Game Controller Dashboard</h1>
 
     <!-- STATUS + CREATE -->
-    <div class="flex items-center gap-4 mb-6">
+    <div class="mb-6">
       <!-- <StatusCard :status="selectedGame?.gameStatus ?? 'CLOSED'" /> -->
 
       <button
