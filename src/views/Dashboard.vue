@@ -35,11 +35,30 @@
         <!-- HEADER CARD -->
         <div class="bg-slate-900 p-6 rounded-2xl shadow-lg border border-white/5">
           <div class="flex justify-between items-center">
-            <div>
-              <p class="text-2xl font-bold">{{ selectedGame.gameDescription }}</p>
-              <p class="text-gray-400 mt-1">
-                {{ formatDate(selectedGame.registeredAt) }}
-              </p>
+            <div class="flex justify-center item gap-10">
+              <div>
+                <p class="text-2xl font-bold">{{ selectedGame.gameDescription }}</p>
+                <p class="text-gray-400 mt-1">
+                  {{ formatDate(selectedGame.registeredAt) }}
+                </p>
+              </div>
+
+              <!--ACTION BUTTON -->
+              <div class="flex gap-3 mt-3">
+                <button
+                  @click="sidebarVisible = true"
+                  class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-xl shadow"
+                >
+                  + CREATE FIGHT
+                </button>
+
+                <button
+                  @click="closeGame"
+                  class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl shadow"
+                >
+                  CLOSE GAME
+                </button>
+              </div>
             </div>
 
             <button
@@ -51,58 +70,25 @@
           </div>
         </div>
 
-        <!-- ACTION CARD -->
-        <div class="bg-slate-900 p-5 rounded-2xl shadow border border-white/5 flex gap-3">
-          <button
-            @click="sidebarVisible = true"
-            class="bg-emerald-600 hover:bg-emerald-700 px-5 py-2 rounded-xl shadow"
-          >
-            + CREATE FIGHT
-          </button>
-
-          <button
-            @click="closeGame"
-            class="bg-red-600 hover:bg-red-700 px-5 py-2 rounded-xl shadow"
-          >
-            CLOSE GAME
-          </button>
-        </div>
-
         <CreateFightSidebar
           :visible="sidebarVisible"
           :game="selectedGame"
           @update:visible="sidebarVisible = $event"
           @fight-created="handleFightCreated"
         />
+
         <!-- FIGHTS CARD -->
-        <div class="bg-slate-900 p-6 rounded-2xl shadow border border-white/5">
-          <!-- EMPTY -->
-          <div v-if="fights.length === 0" class="text-gray-400 text-center py-6">No fights yet</div>
-
-          <!-- LIST -->
-          <div v-else class="flex flex-col gap-3">
-            <div
-              v-for="fight in fights"
-              :key="fight.id"
-              class="bg-slate-800 p-4 rounded-xl flex justify-between items-center hover:bg-slate-700 transition"
-            >
-              <div>
-                <p class="font-bold">Fight #{{ fight.number }}</p>
-                <p class="text-sm text-gray-400">{{ fight.wala }} vs {{ fight.meron }}</p>
-              </div>
-
-              <span
-                class="text-xs px-3 py-1 rounded-full"
-                :class="{
-                  'bg-yellow-500/20 text-yellow-400': fight.status === 'PENDING',
-                  'bg-green-500/20 text-green-400': fight.status === 'OPEN',
-                  'bg-red-500/20 text-red-400': fight.status === 'CLOSED',
-                }"
-              >
-                {{ fight.status }}
-              </span>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 gap-4">
+          <!-- Top Left -->
+          <div class="md:col-span-8 md:row-start-1">
+            <FightDetail />
           </div>
+
+          <!-- Right (same height as top only) -->
+          <div class="md:col-span-4 md:row-start-1 bg-green-200 p-4">Right Panel</div>
+
+          <!-- Bottom Left -->
+          <div class="md:col-span-8 md:row-start-2 p-4"><FightList /></div>
         </div>
       </div>
     </div>
@@ -125,6 +111,8 @@ import {
 } from '@/services/api'
 import { useToast } from 'primevue/usetoast'
 import { ref, onMounted } from 'vue'
+import FightDetail from '@/components/fights/FightDetail.vue'
+import FightList from '@/components/fights/FightList.vue'
 
 const toast = useToast()
 
