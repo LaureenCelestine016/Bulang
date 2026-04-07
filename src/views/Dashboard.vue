@@ -81,14 +81,20 @@
         <div class="grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 gap-4">
           <!-- Top Left -->
           <div class="md:col-span-8 md:row-start-1">
-            <FightDetail />
+            <EmptyState
+              v-if="false"
+              title="No active fight"
+              description="Please create a fight to start."
+              icon="🥊"
+            />
+            <FightDetail v-else />
           </div>
 
           <!-- Right (same height as top only) -->
           <div class="md:col-span-4 md:row-start-1 bg-green-200 p-4">Right Panel</div>
 
           <!-- Bottom Left -->
-          <div class="md:col-span-8 md:row-start-2 p-4"><FightList /></div>
+          <div class="md:col-span-8 md:row-start-2"><FightList /></div>
         </div>
       </div>
     </div>
@@ -100,6 +106,8 @@ import EmptyState from '@/components/dashboard/EmptyState.vue'
 import CreateGameModal from '@/components/modals/CreateGameModal.vue'
 import GameCard from '@/components/dashboard/GameCard.vue'
 import CreateFightSidebar from '@/components/dashboard/CreateFightSidebar.vue'
+import FightDetail from '@/components/fights/FightDetail.vue'
+import FightList from '@/components/fights/FightList.vue'
 import Toast from 'primevue/toast'
 
 import {
@@ -110,9 +118,7 @@ import {
   getFightsByGame,
 } from '@/services/api'
 import { useToast } from 'primevue/usetoast'
-import { ref, onMounted } from 'vue'
-import FightDetail from '@/components/fights/FightDetail.vue'
-import FightList from '@/components/fights/FightList.vue'
+import { ref } from 'vue'
 
 const toast = useToast()
 
@@ -168,7 +174,7 @@ loadGames()
 /* =========================
    MANAGE GAME
 ========================= */
-const startGame = async (gameCode) => {
+const startGame = async (gameCode, status = null) => {
   loading.value = true
 
   try {
@@ -176,22 +182,24 @@ const startGame = async (gameCode) => {
     const gameData = await getGameByCode(gameCode)
     selectedGame.value = gameData
 
-    // 2️⃣ Optimistic update: update the game in games array so GameCard updates immediately
-    const index = games.value.findIndex((g) => g.gameCode === gameCode)
-    if (index !== -1) {
-      games.value[index] = { ...games.value[index], gameStatus: 1 } // triggers reactivity
+    // 👉 ONLY update if may status
+    if (status !== null) {
+      const index = games.value.findIndex((g) => g.gameCode === gameCode)
+      if (index !== -1) {
+        games.value[index] = { ...games.value[index], gameStatus: status }
+      }
+
+      updateGameStatus(gameCode, status).catch((err) => {
+        console.error('Status update failed', err)
+
+        // rollback
+        if (index !== -1) {
+          games.value[index] = { ...games.value[index], gameStatus: 0 }
+        }
+      })
     }
 
-    // 3️⃣ Update backend (non-blocking)
-    updateGameStatus(gameCode, 1).catch((err) => {
-      console.error('Status update failed', err)
-      // Optional rollback if API fails
-      if (index !== -1) {
-        games.value[index] = { ...games.value[index], gameStatus: 0 }
-      }
-    })
-
-    // 4️⃣ Lazy load fights
+    // 4️⃣ Load fights
     fightsLoading.value = true
     getFightsByGame(gameCode)
       .then((data) => (fights.value = data))
@@ -200,13 +208,18 @@ const startGame = async (gameCode) => {
     // 5️⃣ Toast
     toast.add({
       severity: 'success',
-      summary: 'Game Started',
+      summary: status ? 'Game Started' : 'Viewing Game',
       detail: 'Fights are loading...',
       life: 2000,
     })
   } catch (err) {
     console.error(err)
-    toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to start game', life: 3000 })
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Failed to load game',
+      life: 3000,
+    })
   } finally {
     loading.value = false
   }

@@ -1,7 +1,7 @@
 <template>
   <!-- CARD -->
   <div
-    class="bg-gradient-to-br from-[#0f172a] via-[#111827] to-[#020617] rounded-2xl p-6 shadow-xl border border-white/10"
+    class="bg-gradient-to-br from-[#0f172a] via-[#111827] to-[#020617] rounded-xl p-6 shadow-xl border border-white/10"
   >
     <!-- HEADER -->
     <div class="flex justify-between items-center mb-6">
@@ -57,8 +57,6 @@
 
     <!-- ACTION BUTTONS -->
     <div class="flex flex-wrap gap-3 mt-6 justify-center">
-      <button class="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-xl">+ CREATE FIGHT</button>
-
       <button class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl">▶ OPEN BETTING</button>
 
       <button class="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded-xl">

@@ -17,7 +17,7 @@
 
     <button
       v-if="canStartGame"
-      @click="$emit('manage', game.gameCode)"
+      @click="$emit('manage', game.gameCode, 1)"
       class="bg-yellow-600 hover:bg-yellow-700 active:scale-95 transition px-5 py-2 rounded-xl shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
     >
       Start Game
