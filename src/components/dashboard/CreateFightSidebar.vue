@@ -22,17 +22,6 @@
       </div>
 
       <form @submit.prevent="submitFight" class="flex flex-col gap-5 my-5">
-        <!-- CONTROL -->
-        <div>
-          <label class="text-xs text-gray-400">Control No</label>
-          <input
-            v-model="controlNo"
-            type="number"
-            class="w-full mt-1 px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Control No."
-          />
-        </div>
-
         <!-- DESCRIPTION -->
         <div>
           <label class="text-xs text-gray-400">Description</label>
@@ -131,13 +120,11 @@ const props = defineProps({
 
 const emit = defineEmits(['update:visible', 'fight-created'])
 
-const controlNo = ref(null)
 const description = ref('')
 const ltName = ref('')
 const ltParada = ref(0)
 const rtName = ref('')
 const rtParada = ref(0)
-const startDate = ref(null)
 
 const total = computed(() => (ltParada.value || 0) + (rtParada.value || 0))
 const tong = computed(() => total.value * 0.06)
@@ -145,19 +132,17 @@ const tong = computed(() => total.value * 0.06)
 const close = () => emit('update:visible', false)
 
 const submitFight = () => {
-  if (!ltName.value || !rtName.value || !startDate.value) {
+  if (!ltName.value || !rtName.value ) {
     alert('Complete required fields')
     return
   }
 
   emit('fight-created', {
-    controlNo: controlNo.value,
     description: description.value,
     ltName: ltName.value,
     ltParada: ltParada.value,
     rtName: rtName.value,
     rtParada: rtParada.value,
-    startDate: startDate.value,
   })
 
   close()

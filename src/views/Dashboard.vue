@@ -20,7 +20,7 @@
     </div>
 
     <!-- MODAL -->
-    <CreateGameModal :show="showModal" @close="showModal = false" @save="handleSave" />
+    <CreateGameModal :show="showModal" @close="showModal = false" @save="handleGameCreated" />
 
     <!-- MAIN CARD -->
     <div class="">
@@ -94,7 +94,9 @@
           <div class="md:col-span-4 md:row-start-1 bg-green-200 p-4">Right Panel</div>
 
           <!-- Bottom Left -->
-          <div class="md:col-span-8 md:row-start-2"><FightList /></div>
+          <div class="md:col-span-12 md:row-start-2">
+            <FightList :fights="fights" />
+          </div>
         </div>
       </div>
     </div>
@@ -112,6 +114,7 @@ import Toast from 'primevue/toast'
 
 import {
   createGame,
+  createFight,
   updateGameStatus,
   getGameByCode,
   getGames,
@@ -128,7 +131,8 @@ const toast = useToast()
 const showModal = ref(false)
 const sidebarVisible = ref(false)
 const games = ref([])
-const selectedGame = ref(null) // ✅ selected for Manage
+const selectedGame = ref(null)
+const selectedFight = ref(null)
 const fights = ref([])
 const loading = ref(false)
 const fightsLoading = ref(false)
@@ -136,7 +140,7 @@ const fightsLoading = ref(false)
 /* =========================
    CREATE GAME
 ========================= */
-const handleSave = async (data) => {
+const handleGameCreated = async (data) => {
   try {
     const res = await createGame(data)
     selectedGame.value = res.data
@@ -159,7 +163,30 @@ const handleSave = async (data) => {
   }
 }
 
-const handleFightCreated = () => {}
+const handleFightCreated = async (data) => {
+  try {
+    console.log(data)
+
+    const res = await createFight(data)
+    selectedFight.value = res.data
+
+    toast.add({
+      severity: 'success',
+      summary: 'Fight Created',
+      detail: 'Fight successfully created!',
+      life: 3000,
+    })
+
+    showModal.value = false
+  } catch (error) {
+    toast.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: error.message || error,
+      life: 3000,
+    })
+  }
+}
 
 const loadGames = async () => {
   try {
@@ -202,8 +229,15 @@ const startGame = async (gameCode, status = null) => {
     // 4️⃣ Load fights
     fightsLoading.value = true
     getFightsByGame(gameCode)
-      .then((data) => (fights.value = data))
-      .finally(() => (fightsLoading.value = false))
+      .then((data) => {
+        fights.value = data
+      })
+      .catch((err) => {
+        console.error('ERROR:', err)
+      })
+      .finally(() => {
+        fightsLoading.value = false
+      })
 
     // 5️⃣ Toast
     toast.add({

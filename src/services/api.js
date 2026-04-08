@@ -40,43 +40,50 @@ api.interceptors.response.use(
   },
 )
 
-// API functions
+// Create game
 export const createGame = async (data) => {
-  console.log('CREATE GAME PAYLOAD:', data)
-  const response = await api.post('/games', data)
-  return response.data
+  const res = await api.post('/games', data)
+  return res.data
 }
 
+//Create fight
+export const createFight = async (data, gameId) => {
+  const res = await api.post(`/games/${gameId}/fights`, data)
+  return res.data
+}
+
+//Get all Games
 export const getGames = async () => {
   try {
-    const response = await api.get('/games')
-    return response.data.items
+    const res = await api.get('/games')
+    return res.data.items
   } catch (err) {
     console.error('Error fetching games:', err.response?.data || err.message || err)
     return []
   }
 }
 
+//Get specific games
 export const getGameByCode = async (gameId) => {
   const res = await api.get(`/games/${gameId}`)
-  console.log('GameByCode:', res.data)
-
   return res.data
 }
 
+//Get all fights
 export const getFightsByGame = async (gameId) => {
-  console.log(gameId)
+  try {
+    const res = await api.get(`/games/${gameId}/fights?status=0`)
 
-  const res = await api.get(`/games/${gameId}/fights?status=${0}`)
-  console.log('RAW RESPONSE:', res)
-  console.log('FIGHTS DATA:', res.data)
-
-  return res.data
+    return res.data.items || res.data
+  } catch (err) {
+    console.error('Error fetching fights:', err)
+    throw err
+  }
 }
 
+//Update game status
 export const updateGameStatus = async (gameId, status) => {
   const res = await api.patch(`/games/${gameId}`, { gameStatus: status })
-
   return res.data
 }
 
