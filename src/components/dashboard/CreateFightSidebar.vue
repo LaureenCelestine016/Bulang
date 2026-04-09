@@ -33,6 +33,16 @@
           />
         </div>
 
+        <div>
+          <label class="text-xs text-gray-400">Fight Duration (seconds)</label>
+          <input
+            v-model="duration"
+            type="text"
+            class="w-full mt-1 px-4 py-2 rounded-lg bg-white/5 border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="e.g. 120 seconds"
+          />
+        </div>
+
         <!-- MERON -->
         <div
           class="bg-gradient-to-br from-red-600/80 via-red-500/70 to-red-400/60 border border-red-400/30 shadow-inner p-4 rounded-xl flex flex-col gap-3 backdrop-blur-md hover:scale-[1.01] transition-transform duration-200 mt-3"
@@ -113,7 +123,7 @@ import { ref, computed } from 'vue'
 
 import Button from 'primevue/button'
 
-const props = defineProps({
+defineProps({
   visible: Boolean,
   game: Object,
 })
@@ -121,28 +131,30 @@ const props = defineProps({
 const emit = defineEmits(['update:visible', 'fight-created'])
 
 const description = ref('')
+const duration = ref('')
 const ltName = ref('')
 const ltParada = ref(0)
 const rtName = ref('')
 const rtParada = ref(0)
 
-const total = computed(() => (ltParada.value || 0) + (rtParada.value || 0))
+const total = computed(() => (parseFloat(ltParada.value) || 0) + (parseFloat(rtParada.value) || 0))
 const tong = computed(() => total.value * 0.06)
 
 const close = () => emit('update:visible', false)
 
 const submitFight = () => {
-  if (!ltName.value || !rtName.value ) {
+  if (!ltName.value || !rtName.value) {
     alert('Complete required fields')
     return
   }
 
   emit('fight-created', {
-    description: description.value,
-    ltName: ltName.value,
-    ltParada: ltParada.value,
-    rtName: rtName.value,
-    rtParada: rtParada.value,
+    fightDescription: description.value,
+    fightDuration: parseInt(duration.value),
+    fightLTName: ltName.value,
+    fightLTParada: parseInt(ltParada.value),
+    fightRTName: rtName.value,
+    fightRTParada: parseInt(rtParada.value),
   })
 
   close()

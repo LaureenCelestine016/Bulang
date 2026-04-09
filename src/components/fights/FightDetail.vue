@@ -31,7 +31,7 @@
         <p class="text-gray-300">{{ fight.wala }}</p>
 
         <p class="mt-4 text-sm text-gray-400">TOTAL BETS</p>
-        <h1 class="text-2xl font-bold">₱ {{ totalWala }}</h1>
+        <h1 class="text-2xl font-bold">₱ {{ totalWalaFormatted }}</h1>
 
         <p class="text-xs text-gray-400 mt-2">ODDS</p>
         <p class="text-sm">{{ oddsWala }}</p>
@@ -43,7 +43,7 @@
         <p class="text-gray-300">{{ fight.meron }}</p>
 
         <p class="mt-4 text-sm text-gray-400">TOTAL BETS</p>
-        <h1 class="text-2xl font-bold">₱ {{ totalMeron }}</h1>
+        <h1 class="text-2xl font-bold">₱ {{ totalMeronFormatted }}</h1>
 
         <p class="text-xs text-gray-400 mt-2">ODDS</p>
         <p class="text-sm">{{ oddsMeron }}</p>
@@ -55,25 +55,47 @@
       </div>
     </div>
 
-    <!-- ACTION BUTTONS -->
-    <div class="flex flex-wrap gap-3 mt-6 justify-center">
-      <button class="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl">▶ OPEN BETTING</button>
-
-      <button class="bg-yellow-600 hover:bg-yellow-700 px-4 py-2 rounded-xl">
-        🔒 CLOSE BETTING
+    <!-- ACTION BUTTONS (MOVED HERE ✅) -->
+    <div class="flex gap-4 mt-6 justify-center">
+      <!-- OPEN BETTING -->
+      <button
+        :disabled="fight.status === 'BETTING OPEN'"
+        class="px-6 py-3 rounded-2xl font-semibold text-white shadow-lg transition-all duration-300 bg-gradient-to-r from-green-500 to-emerald-600 hover:scale-105 hover:shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+        @click="openBetting"
+      >
+        ▶ OPEN BETTING
       </button>
 
-      <button class="bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-xl">⚡ START FIGHT</button>
+      <!-- CLOSE BETTING -->
+      <button
+        :disabled="fight.status !== 'BETTING OPEN'"
+        class="px-6 py-3 rounded-2xl font-semibold text-black shadow-lg transition-all duration-300 bg-gradient-to-r from-yellow-500 to-amber-600 hover:scale-105 hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+        @click="closeBetting"
+      >
+        🔒 CLOSE BETTING
+      </button>
     </div>
 
     <!-- DECLARE WINNER -->
-    <div class="mt-6 text-center">
-      <p class="text-gray-400 mb-2">DECLARE WINNER</p>
+    <div class="mt-10 text-center">
+      <p class="text-gray-400 mb-3 tracking-wide">DECLARE WINNER</p>
 
-      <div class="flex gap-4 justify-center">
-        <button class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-xl">🏆 WALA WINS</button>
+      <div class="flex gap-5 justify-center flex-wrap">
+        <!-- WALA WIN -->
+        <button
+          class="px-7 py-3 rounded-2xl font-semibold text-white shadow-lg transition-all duration-300 bg-gradient-to-r from-blue-500 to-indigo-600 hover:scale-105 hover:shadow-blue-500/30"
+          @click="declareWinner('WALA')"
+        >
+          🏆 WALA WINS
+        </button>
 
-        <button class="bg-red-600 hover:bg-red-700 px-6 py-2 rounded-xl">🏆 MERON WINS</button>
+        <!-- MERON WIN -->
+        <button
+          class="px-7 py-3 rounded-2xl font-semibold text-white shadow-lg transition-all duration-300 bg-gradient-to-r from-red-500 to-rose-600 hover:scale-105 hover:shadow-red-500/30"
+          @click="declareWinner('MERON')"
+        >
+          🏆 MERON WINS
+        </button>
       </div>
     </div>
   </div>
@@ -82,7 +104,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 
-/* SAMPLE DATA (palitan mo from API) */
+/* SAMPLE DATA */
 const fight = ref({
   number: 1,
   wala: 'Black Thunder',
@@ -90,18 +112,45 @@ const fight = ref({
   status: 'BETTING OPEN',
 })
 
-const totalWala = ref('15,250.00')
-const totalMeron = ref('8,750.00')
+/* ✅ USE NUMBER (NOT STRING) */
+const totalWala = ref(15250)
+const totalMeron = ref(8750)
+
+/* FORMAT DISPLAY */
+const formatCurrency = (num) => {
+  return num.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+}
+
+const totalWalaFormatted = computed(() => formatCurrency(totalWala.value))
+const totalMeronFormatted = computed(() => formatCurrency(totalMeron.value))
 
 /* TIMER */
 const timer = ref('00:45')
 
-/* ODDS COMPUTE */
+/* ODDS COMPUTE (FIXED ✅) */
 const oddsWala = computed(() => {
-  return (totalMeron.value / totalWala.value || 1).toFixed(2)
+  if (totalWala.value === 0) return '1.00'
+  return (totalMeron.value / totalWala.value).toFixed(2)
 })
 
 const oddsMeron = computed(() => {
-  return (totalWala.value / totalMeron.value || 1).toFixed(2)
+  if (totalMeron.value === 0) return '1.00'
+  return (totalWala.value / totalMeron.value).toFixed(2)
 })
+
+/* ACTIONS */
+const openBetting = () => {
+  fight.value.status = 'BETTING OPEN'
+}
+
+const closeBetting = () => {
+  fight.value.status = 'BETTING CLOSED'
+}
+
+const declareWinner = (side) => {
+  alert(`${side} WINS`)
+}
 </script>

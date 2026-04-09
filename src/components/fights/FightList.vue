@@ -22,6 +22,7 @@
               <th class="px-4 py-3">Wala</th>
               <th class="px-4 py-3">Meron</th>
               <th class="px-4 py-3 text-center">Status</th>
+              <th class="px-4 py-3 text-center">Action</th>
             </tr>
           </thead>
 
@@ -41,7 +42,7 @@
               </td>
 
               <td class="px-4 py-3 text-gray-400">
-                {{ formatDate(fight.fightStart) }}
+                {{ formatDate(fight.registeredAt) }}
               </td>
 
               <td class="px-4 py-3">{{ fight.fightLTName }}</td>
@@ -54,6 +55,13 @@
                 >
                   {{ fight.fightStatus }}
                 </span>
+              </td>
+              <td class="px-4 py-3 text-center">
+                <button
+                  class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded-md text-xs font-medium"
+                >
+                  VIEW FIGHT
+                </button>
               </td>
             </tr>
           </tbody>

@@ -165,9 +165,7 @@ const handleGameCreated = async (data) => {
 
 const handleFightCreated = async (data) => {
   try {
-    console.log(data)
-
-    const res = await createFight(data)
+    const res = await createFight(data, selectedGame.value.gameCode)
     selectedFight.value = res.data
 
     toast.add({
@@ -176,9 +174,9 @@ const handleFightCreated = async (data) => {
       detail: 'Fight successfully created!',
       life: 3000,
     })
-
-    showModal.value = false
   } catch (error) {
+    console.log(error)
+
     toast.add({
       severity: 'error',
       summary: 'Error',
@@ -230,6 +228,8 @@ const startGame = async (gameCode, status = null) => {
     fightsLoading.value = true
     getFightsByGame(gameCode)
       .then((data) => {
+        console.log(data)
+
         fights.value = data
       })
       .catch((err) => {
