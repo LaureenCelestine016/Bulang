@@ -69,6 +69,12 @@ export const getGameByCode = async (gameId) => {
   return res.data
 }
 
+//Update game status
+export const updateGameStatus = async (gameId, status) => {
+  const res = await api.patch(`/games/${gameId}`, { gameStatus: status })
+  return res.data
+}
+
 //Get all fights
 export const getFightsByGame = async (gameId) => {
   try {
@@ -81,10 +87,13 @@ export const getFightsByGame = async (gameId) => {
   }
 }
 
-//Update game status
-export const updateGameStatus = async (gameId, status) => {
-  const res = await api.patch(`/games/${gameId}`, { gameStatus: status })
-  return res.data
+export const getFightDetail = async (fightId, gameId) => {
+  try {
+    const res = await api.get(`/games/${gameId}/fights/${fightId}`)
+    return res.data
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 export default api

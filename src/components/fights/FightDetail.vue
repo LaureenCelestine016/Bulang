@@ -7,13 +7,13 @@
     <div class="flex justify-between items-center mb-6">
       <div>
         <p class="text-gray-400 text-sm">Fight Number</p>
-        <h1 class="text-3xl font-bold">#{{ fight.number }}</h1>
+        <h1 class="text-3xl font-bold">#{{ fight.fightNo }}</h1>
       </div>
 
       <div>
         <p class="text-gray-400 text-sm">Status</p>
         <span class="bg-yellow-500 text-black px-3 py-1 rounded-full text-sm font-semibold">
-          {{ fight.status }}
+          {{ fight.fightStatus }}
         </span>
       </div>
 
@@ -28,10 +28,10 @@
       <!-- WALA -->
       <div class="bg-blue-900/40 p-6 rounded-xl border border-blue-500/20 text-center">
         <h2 class="text-xl font-bold text-blue-300">WALA</h2>
-        <p class="text-gray-300">{{ fight.wala }}</p>
+        <p class="text-gray-300">{{ fight.fightLTName.toUpperCase() }}</p>
 
         <p class="mt-4 text-sm text-gray-400">TOTAL BETS</p>
-        <h1 class="text-2xl font-bold">₱ {{ totalWalaFormatted }}</h1>
+        <h1 class="text-2xl font-bold">{{ formatPeso(fight.fightLTParada) }}</h1>
 
         <p class="text-xs text-gray-400 mt-2">ODDS</p>
         <p class="text-sm">{{ oddsWala }}</p>
@@ -40,10 +40,10 @@
       <!-- MERON -->
       <div class="bg-red-900/40 p-6 rounded-xl border border-red-500/20 text-center">
         <h2 class="text-xl font-bold text-red-300">MERON</h2>
-        <p class="text-gray-300">{{ fight.meron }}</p>
+        <p class="text-gray-300">{{ fight.fightRTName.toUpperCase() }}</p>
 
         <p class="mt-4 text-sm text-gray-400">TOTAL BETS</p>
-        <h1 class="text-2xl font-bold">₱ {{ totalMeronFormatted }}</h1>
+        <h1 class="text-2xl font-bold">{{ formatPeso(fight.fightRTParada) }}</h1>
 
         <p class="text-xs text-gray-400 mt-2">ODDS</p>
         <p class="text-sm">{{ oddsMeron }}</p>
@@ -102,55 +102,11 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-
-/* SAMPLE DATA */
-const fight = ref({
-  number: 1,
-  wala: 'Black Thunder',
-  meron: 'White Lightning',
-  status: 'BETTING OPEN',
+defineProps({
+  fight: Object,
 })
 
-/* ✅ USE NUMBER (NOT STRING) */
-const totalWala = ref(15250)
-const totalMeron = ref(8750)
-
-/* FORMAT DISPLAY */
-const formatCurrency = (num) => {
-  return num.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
-}
-
-const totalWalaFormatted = computed(() => formatCurrency(totalWala.value))
-const totalMeronFormatted = computed(() => formatCurrency(totalMeron.value))
-
-/* TIMER */
-const timer = ref('00:45')
-
-/* ODDS COMPUTE (FIXED ✅) */
-const oddsWala = computed(() => {
-  if (totalWala.value === 0) return '1.00'
-  return (totalMeron.value / totalWala.value).toFixed(2)
-})
-
-const oddsMeron = computed(() => {
-  if (totalMeron.value === 0) return '1.00'
-  return (totalWala.value / totalMeron.value).toFixed(2)
-})
-
-/* ACTIONS */
-const openBetting = () => {
-  fight.value.status = 'BETTING OPEN'
-}
-
-const closeBetting = () => {
-  fight.value.status = 'BETTING CLOSED'
-}
-
-const declareWinner = (side) => {
-  alert(`${side} WINS`)
+const formatPeso = (num) => {
+  return '₱ ' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
 }
 </script>

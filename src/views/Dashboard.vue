@@ -82,12 +82,12 @@
           <!-- Top Left -->
           <div class="md:col-span-8 md:row-start-1">
             <EmptyState
-              v-if="false"
+              v-if="!selectedFight"
               title="No active fight"
               description="Please create a fight to start."
               icon="🥊"
             />
-            <FightDetail v-else />
+            <FightDetail v-else :fight="selectedFight" />
           </div>
 
           <!-- Right (same height as top only) -->
@@ -95,7 +95,7 @@
 
           <!-- Bottom Left -->
           <div class="md:col-span-12 md:row-start-2">
-            <FightList :fights="fights" />
+            <FightList :fights="fights" @selectFight="fetchFightDetail" />
           </div>
         </div>
       </div>
@@ -119,6 +119,7 @@ import {
   getGameByCode,
   getGames,
   getFightsByGame,
+  getFightDetail,
 } from '@/services/api'
 import { useToast } from 'primevue/usetoast'
 import { ref } from 'vue'
@@ -196,6 +197,16 @@ const loadGames = async () => {
 }
 loadGames()
 
+const fetchFightDetail = async (fightId) => {
+  try {
+    const res = await getFightDetail(fightId, selectedGame.value.gameCode)
+
+    selectedFight.value = res
+  } catch (err) {
+    console.log(err)
+  }
+}
+
 /* =========================
    MANAGE GAME
 ========================= */
@@ -228,8 +239,6 @@ const startGame = async (gameCode, status = null) => {
     fightsLoading.value = true
     getFightsByGame(gameCode)
       .then((data) => {
-        console.log(data)
-
         fights.value = data
       })
       .catch((err) => {

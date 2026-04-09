@@ -30,7 +30,7 @@
           <tbody class="text-gray-300">
             <tr
               v-for="fight in fights"
-              :key="fight.id"
+              :key="fight.fightCode"
               class="border-t border-white/5 hover:bg-white/5 transition"
             >
               <td class="px-4 py-3 font-medium text-white">
@@ -58,6 +58,7 @@
               </td>
               <td class="px-4 py-3 text-center">
                 <button
+                  @click="viewFight(fight.fightCode)"
                   class="bg-green-600 hover:bg-green-700 px-3 py-1 rounded-md text-xs font-medium"
                 >
                   VIEW FIGHT
@@ -112,4 +113,10 @@ const statusClass = (status) => {
 defineProps({
   fights: Array,
 })
+
+const emit = defineEmits(['selectFight'])
+
+const viewFight = (fightId) => {
+  emit('selectFight', fightId)
+}
 </script>
