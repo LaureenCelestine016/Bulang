@@ -43,12 +43,16 @@ api.interceptors.response.use(
 // Create game
 export const createGame = async (data) => {
   const res = await api.post('/games', data)
+
   return res.data
 }
 
 //Create fight
 export const createFight = async (data, gameId) => {
   const res = await api.post(`/games/${gameId}/fights`, data)
+  console.log(res)
+  console.log(res.data)
+
   return res.data
 }
 

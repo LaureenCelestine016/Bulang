@@ -131,13 +131,12 @@ const toast = useToast()
 ========================= */
 const showModal = ref(false)
 const sidebarVisible = ref(false)
-const games = ref([])
 const selectedGame = ref(null)
 const selectedFight = ref(null)
-const fights = ref([])
 const loading = ref(false)
 const fightsLoading = ref(false)
-
+const games = ref([])
+const fights = ref([])
 /* =========================
    CREATE GAME
 ========================= */
@@ -164,10 +163,13 @@ const handleGameCreated = async (data) => {
   }
 }
 
+/* =========================
+   Create Fight
+========================= */
 const handleFightCreated = async (data) => {
   try {
     const res = await createFight(data, selectedGame.value.gameCode)
-    selectedFight.value = res.data
+    fights.value.unshift(res.data)
 
     toast.add({
       severity: 'success',
@@ -200,7 +202,6 @@ loadGames()
 const fetchFightDetail = async (fightId) => {
   try {
     const res = await getFightDetail(fightId, selectedGame.value.gameCode)
-
     selectedFight.value = res
   } catch (err) {
     console.log(err)
@@ -212,7 +213,7 @@ const fetchFightDetail = async (fightId) => {
 ========================= */
 const startGame = async (gameCode, status = null) => {
   loading.value = true
-
+  selectedFight.value = null
   try {
     // 1️⃣ Load specific game
     const gameData = await getGameByCode(gameCode)
@@ -235,7 +236,7 @@ const startGame = async (gameCode, status = null) => {
       })
     }
 
-    // 4️⃣ Load fights
+    // Load fights
     fightsLoading.value = true
     getFightsByGame(gameCode)
       .then((data) => {
@@ -248,7 +249,7 @@ const startGame = async (gameCode, status = null) => {
         fightsLoading.value = false
       })
 
-    // 5️⃣ Toast
+    // Toast
     toast.add({
       severity: 'success',
       summary: status ? 'Game Started' : 'Viewing Game',
