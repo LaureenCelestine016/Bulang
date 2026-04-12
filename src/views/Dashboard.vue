@@ -87,7 +87,7 @@
               description="Please create a fight to start."
               icon="🥊"
             />
-            <FightDetail v-else :fight="selectedFight" />
+            <FightDetail v-else :fight="selectedFight" @select-open-betting="updateFightStatus" />
           </div>
 
           <!-- Right (same height as top only) -->
@@ -189,6 +189,10 @@ const handleFightCreated = async (data) => {
   }
 }
 
+/* =========================
+   Fetch All Games
+========================= */
+
 const loadGames = async () => {
   try {
     games.value = await getGames()
@@ -199,6 +203,9 @@ const loadGames = async () => {
 }
 loadGames()
 
+/* =========================
+   Fetch Fight Details
+========================= */
 const fetchFightDetail = async (fightId) => {
   try {
     const res = await getFightDetail(fightId, selectedGame.value.gameCode)
@@ -267,6 +274,14 @@ const startGame = async (gameCode, status = null) => {
   } finally {
     loading.value = false
   }
+}
+
+/* =========================
+   Update Fight Status
+========================= */
+
+const updateFightStatus = () => {
+  console.log('Test')
 }
 
 /* =========================

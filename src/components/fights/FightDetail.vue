@@ -128,4 +128,10 @@ defineProps({
 const formatPeso = (num) => {
   return '₱ ' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
 }
+
+const emit = defineEmits(['selectOpenBetting'])
+
+const openBetting = () => {
+  emit('selectOpenBetting')
+}
 </script>
