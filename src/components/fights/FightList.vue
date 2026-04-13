@@ -33,9 +33,7 @@
               :key="fight.fightCode"
               class="border-t border-white/5 hover:bg-white/5 transition"
             >
-              <td class="px-4 py-3 font-medium text-white">
-                {{ fight.fightNo }}
-              </td>
+              <td class="px-4 py-3 font-medium text-white">{{ fight.fightNo }}</td>
 
               <td class="px-4 py-3 font-medium text-white">
                 {{ fight.fightDescription }}

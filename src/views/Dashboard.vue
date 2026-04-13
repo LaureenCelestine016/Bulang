@@ -87,11 +87,11 @@
               description="Please create a fight to start."
               icon="🥊"
             />
-            <FightDetail v-else :fight="selectedFight" @select-open-betting="updateFightStatus" />
+            <FightDetail v-else :fight="selectedFight" @select-open-betting="updateFight" />
           </div>
 
           <!-- Right (same height as top only) -->
-          <div class="md:col-span-4 md:row-start-1 bg-green-200 p-4">Right Panel</div>
+          <div class="md:col-span-4 md:row-start-1"><FightBet /></div>
 
           <!-- Bottom Left -->
           <div class="md:col-span-12 md:row-start-2">
@@ -110,6 +110,7 @@ import GameCard from '@/components/dashboard/GameCard.vue'
 import CreateFightSidebar from '@/components/dashboard/CreateFightSidebar.vue'
 import FightDetail from '@/components/fights/FightDetail.vue'
 import FightList from '@/components/fights/FightList.vue'
+import FightBet from '@/components/fights/FightBet.vue'
 import Toast from 'primevue/toast'
 
 import {
@@ -120,6 +121,7 @@ import {
   getGames,
   getFightsByGame,
   getFightDetail,
+  updateFightStatus,
 } from '@/services/api'
 import { useToast } from 'primevue/usetoast'
 import { ref } from 'vue'
@@ -280,8 +282,13 @@ const startGame = async (gameCode, status = null) => {
    Update Fight Status
 ========================= */
 
-const updateFightStatus = () => {
-  console.log('Test')
+const updateFight = async (fightId) => {
+  try {
+    const res = await updateFightStatus(selectedGame.value.gameCode, fightId, 1)
+    selectedFight.value = res.data
+  } catch (err) {
+    console.log(err)
+  }
 }
 
 /* =========================

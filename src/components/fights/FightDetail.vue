@@ -6,10 +6,8 @@
     <!-- HEADER -->
     <div class="flex justify-between items-center mb-6">
       <div>
-        <p class="text-gray-400 text-sm">Fight Number</p>
-        <div class="bg-yellow-500 text-center rounded-lg text-gray-900">
-          <h1 class="text-3xl font-bold">#{{ fight.fightNo }}</h1>
-        </div>
+        <p class="text-gray-400 text-sm">Fight No.</p>
+        <h1 class="text-3xl font-bold">#{{ fight.fightNo }}</h1>
       </div>
 
       <div>
@@ -72,7 +70,7 @@
       <button
         :disabled="fight.status === 'BETTING OPEN'"
         class="px-6 py-3 rounded-lg font-semibold text-white shadow-lg transition-all duration-300 bg-gradient-to-r from-green-500 to-emerald-600 hover:scale-105 hover:shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
-        @click="openBetting"
+        @click="openBetting(fight.fightCode)"
       >
         ▶ OPEN BETTING
       </button>
@@ -131,7 +129,7 @@ const formatPeso = (num) => {
 
 const emit = defineEmits(['selectOpenBetting'])
 
-const openBetting = () => {
-  emit('selectOpenBetting')
+const openBetting = (fightId) => {
+  emit('selectOpenBetting', fightId)
 }
 </script>
