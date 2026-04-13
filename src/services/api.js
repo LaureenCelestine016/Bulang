@@ -43,16 +43,12 @@ api.interceptors.response.use(
 // Create game
 export const createGame = async (data) => {
   const res = await api.post('/games', data)
-
   return res.data
 }
 
 //Create fight
 export const createFight = async (data, gameId) => {
   const res = await api.post(`/games/${gameId}/fights`, data)
-  console.log(res)
-  console.log(res.data)
-
   return res.data
 }
 
@@ -83,7 +79,6 @@ export const updateGameStatus = async (gameId, status) => {
 export const getFightsByGame = async (gameId) => {
   try {
     const res = await api.get(`/games/${gameId}/fights?status=0`)
-
     return res.data.items || res.data
   } catch (err) {
     console.error('Error fetching fights:', err)
@@ -101,8 +96,6 @@ export const getFightDetail = async (fightId, gameId) => {
 }
 
 export const updateFightStatus = async (gameId, fightId, status) => {
-  console.log(gameId, fightId, status)
-
   try {
     const res = await api.patch(`/games/${gameId}/fights/${fightId}`, { fightStatus: status })
     return res.data

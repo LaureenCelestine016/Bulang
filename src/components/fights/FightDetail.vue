@@ -13,7 +13,7 @@
       <div>
         <p class="text-gray-400 text-sm">Status</p>
         <span class="bg-yellow-500 text-black px-3 py-1 rounded-lg text-sm font-semibold">
-          {{ fight.fightStatus }}
+          {{ fight.fightStatus }} {{ fight }}
         </span>
       </div>
 
@@ -68,7 +68,7 @@
     <div class="flex gap-4 mt-6 justify-center">
       <!-- OPEN BETTING -->
       <button
-        :disabled="fight.status === 'BETTING OPEN'"
+        :disabled="fight.fightStatus !== 'PENDING'"
         class="px-6 py-3 rounded-lg font-semibold text-white shadow-lg transition-all duration-300 bg-gradient-to-r from-green-500 to-emerald-600 hover:scale-105 hover:shadow-green-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
         @click="openBetting(fight.fightCode)"
       >
@@ -77,7 +77,7 @@
 
       <!-- CLOSE BETTING -->
       <button
-        :disabled="fight.status !== 'BETTING OPEN'"
+        :disabled="fight.fightStatus !== 'BETTING OPEN'"
         class="px-6 py-3 rounded-lg font-semibold text-white shadow-lg transition-all duration-300 bg-gradient-to-r from-yellow-500 to-amber-600 hover:scale-105 hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
         @click="closeBetting"
       >
@@ -126,7 +126,6 @@ defineProps({
 const formatPeso = (num) => {
   return '₱ ' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
 }
-
 const emit = defineEmits(['selectOpenBetting'])
 
 const openBetting = (fightId) => {

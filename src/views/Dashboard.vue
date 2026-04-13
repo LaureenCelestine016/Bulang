@@ -139,13 +139,15 @@ const loading = ref(false)
 const fightsLoading = ref(false)
 const games = ref([])
 const fights = ref([])
+const offset = ref(0)
+let timerInterval = null
 /* =========================
    CREATE GAME
 ========================= */
 const handleGameCreated = async (data) => {
   try {
     const res = await createGame(data)
-    selectedGame.value = res.data
+    games.value.push(res)
 
     toast.add({
       severity: 'success',
@@ -171,7 +173,7 @@ const handleGameCreated = async (data) => {
 const handleFightCreated = async (data) => {
   try {
     const res = await createFight(data, selectedGame.value.gameCode)
-    fights.value.unshift(res.data)
+    fights.value.push(res)
 
     toast.add({
       severity: 'success',
@@ -285,10 +287,46 @@ const startGame = async (gameCode, status = null) => {
 const updateFight = async (fightId) => {
   try {
     const res = await updateFightStatus(selectedGame.value.gameCode, fightId, 1)
-    selectedFight.value = res.data
+    selectedFight.value = res
+
+    const serverTime = new Date(res.fightServerTime)
+    offset.value = serverTime - new Date()
+
+    startTimer()
   } catch (err) {
     console.log(err)
   }
+}
+
+const getServerNow = () => {
+  return new Date(new Date().getTime() + offset.value)
+}
+
+const remainingTime = ref('')
+
+const startTimer = () => {
+  // clear previous timer para iwas duplicate
+  if (timerInterval) clearInterval(timerInterval)
+
+  timerInterval = setInterval(() => {
+    if (!selectedFight.value) return
+
+    const now = getServerNow()
+    const end = new Date(selectedFight.value.fightEnd)
+
+    const remaining = end - now
+
+    if (remaining <= 0) {
+      remainingTime.value = '00:00'
+      clearInterval(timerInterval)
+      return
+    }
+
+    const minutes = Math.floor(remaining / 1000 / 60)
+    const seconds = Math.floor((remaining / 1000) % 60)
+
+    remainingTime.value = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0')
+  }, 1000)
 }
 
 /* =========================
