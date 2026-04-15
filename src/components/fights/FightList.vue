@@ -19,8 +19,8 @@
               <th class="px-4 py-3">Fight #</th>
               <th class="px-4 py-3">Description</th>
               <th class="px-4 py-3">Date</th>
-              <th class="px-4 py-3">Wala</th>
               <th class="px-4 py-3">Meron</th>
+              <th class="px-4 py-3">Wala</th>
               <th class="px-4 py-3 text-center">Status</th>
               <th class="px-4 py-3 text-center">Action</th>
             </tr>

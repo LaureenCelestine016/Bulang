@@ -61,7 +61,7 @@
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, onMounted } from 'vue'
 
 defineProps({
   show: Boolean,
@@ -77,4 +77,21 @@ const form = reactive({
 const submit = () => {
   emit('save', form)
 }
+
+onMounted(() => {
+  const now = new Date()
+
+  const formatted =
+    now.getFullYear() +
+    '-' +
+    String(now.getMonth() + 1).padStart(2, '0') +
+    '-' +
+    String(now.getDate()).padStart(2, '0') +
+    'T' +
+    String(now.getHours()).padStart(2, '0') +
+    ':' +
+    String(now.getMinutes()).padStart(2, '0')
+
+  form.startDate = formatted
+})
 </script>

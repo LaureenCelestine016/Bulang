@@ -25,77 +25,78 @@
     <!-- MAIN CARD -->
     <div class="">
       <!-- EMPTY -->
-      <EmptyState v-if="!games" />
+      <EmptyState v-if="!games?.length" />
 
-      <!-- GAME EXIST -->
-      <div v-if="!selectedGame" class="flex flex-col gap-4">
-        <GameCard v-for="game in games" :key="game.gameCode" :game="game" @manage="startGame" />
-      </div>
-      <div v-else class="flex flex-col gap-6">
-        <!-- HEADER CARD -->
-        <div class="bg-slate-900 p-6 rounded-2xl shadow-lg border border-white/5">
-          <div class="flex justify-between items-center">
-            <div class="flex justify-center item gap-10">
-              <div>
-                <p class="text-2xl font-bold">{{ selectedGame.gameDescription }}</p>
-                <p class="text-gray-400 mt-1">
-                  {{ formatDate(selectedGame.registeredAt) }}
-                </p>
+      <div v-else>
+        <div v-if="!selectedGame" class="flex flex-col gap-4">
+          <GameCard v-for="game in games" :key="game.gameCode" :game="game" @manage="startGame" />
+        </div>
+        <div v-else class="flex flex-col gap-6">
+          <!-- HEADER CARD -->
+          <div class="bg-slate-900 p-6 rounded-2xl shadow-lg border border-white/5">
+            <div class="flex justify-between items-center">
+              <div class="flex justify-center item gap-10">
+                <div>
+                  <p class="text-2xl font-bold">{{ selectedGame.gameDescription }}</p>
+                  <p class="text-gray-400 mt-1">
+                    {{ formatDate(selectedGame.registeredAt) }}
+                  </p>
+                </div>
+
+                <!--ACTION BUTTON -->
+                <div class="flex gap-3 mt-3">
+                  <button
+                    @click="sidebarVisible = true"
+                    class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-xl shadow"
+                  >
+                    + CREATE FIGHT
+                  </button>
+
+                  <button
+                    @click="closeGame"
+                    class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl shadow"
+                  >
+                    CLOSE GAME
+                  </button>
+                </div>
               </div>
 
-              <!--ACTION BUTTON -->
-              <div class="flex gap-3 mt-3">
-                <button
-                  @click="sidebarVisible = true"
-                  class="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-xl shadow"
-                >
-                  + CREATE FIGHT
-                </button>
+              <button
+                @click="selectedGame = null"
+                class="bg-gray-700 hover:bg-gray-800 px-4 py-2 rounded-xl"
+              >
+                ← Back
+              </button>
+            </div>
+          </div>
 
-                <button
-                  @click="closeGame"
-                  class="bg-red-600 hover:bg-red-700 px-4 py-2 rounded-xl shadow"
-                >
-                  CLOSE GAME
-                </button>
-              </div>
+          <CreateFightSidebar
+            :visible="sidebarVisible"
+            :game="selectedGame"
+            @update:visible="sidebarVisible = $event"
+            @fight-created="handleFightCreated"
+          />
+
+          <!-- FIGHTS CARD -->
+          <div class="grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 gap-4">
+            <!-- Top Left -->
+            <div class="md:col-span-8 md:row-start-1">
+              <EmptyState
+                v-if="!selectedFight"
+                title="No active fight"
+                description="Please create a fight to start."
+                icon="🥊"
+              />
+              <FightDetail v-else :fight="selectedFight" @select-open-betting="updateFight" />
             </div>
 
-            <button
-              @click="selectedGame = null"
-              class="bg-gray-700 hover:bg-gray-800 px-4 py-2 rounded-xl"
-            >
-              ← Back
-            </button>
-          </div>
-        </div>
+            <!-- Right (same height as top only) -->
+            <div class="md:col-span-4 md:row-start-1"><FightBet /></div>
 
-        <CreateFightSidebar
-          :visible="sidebarVisible"
-          :game="selectedGame"
-          @update:visible="sidebarVisible = $event"
-          @fight-created="handleFightCreated"
-        />
-
-        <!-- FIGHTS CARD -->
-        <div class="grid grid-cols-1 md:grid-cols-12 md:grid-rows-2 gap-4">
-          <!-- Top Left -->
-          <div class="md:col-span-8 md:row-start-1">
-            <EmptyState
-              v-if="!selectedFight"
-              title="No active fight"
-              description="Please create a fight to start."
-              icon="🥊"
-            />
-            <FightDetail v-else :fight="selectedFight" @select-open-betting="updateFight" />
-          </div>
-
-          <!-- Right (same height as top only) -->
-          <div class="md:col-span-4 md:row-start-1"><FightBet /></div>
-
-          <!-- Bottom Left -->
-          <div class="md:col-span-12 md:row-start-2">
-            <FightList :fights="fights" @selectFight="fetchFightDetail" />
+            <!-- Bottom Left -->
+            <div class="md:col-span-12 md:row-start-2">
+              <FightList :fights="fights" @selectFight="fetchFightDetail" />
+            </div>
           </div>
         </div>
       </div>
@@ -146,6 +147,8 @@ const fights = ref([])
 const handleGameCreated = async (data) => {
   try {
     const res = await createGame(data)
+    console.log(res)
+
     games.value.push(res)
 
     toast.add({
@@ -165,6 +168,9 @@ const handleGameCreated = async (data) => {
     })
   }
 }
+
+console.log(new Date('2026-04-14T07:54:10.227').toString())
+console.log(new Date('2026-04-14T07:54:10.227Z').toString())
 
 /* =========================
    Create Fight
@@ -300,12 +306,14 @@ const updateFight = async (fightId) => {
 ========================= */
 const formatDate = (iso) => {
   if (!iso) return ''
-  return new Date(iso).toLocaleString('en-US', {
+
+  return new Date(iso).toLocaleString('en-PH', {
+    year: 'numeric',
     month: 'long',
     day: 'numeric',
-    year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    hour12: true,
   })
 }
 </script>

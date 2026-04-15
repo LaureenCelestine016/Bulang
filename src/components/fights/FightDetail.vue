@@ -28,13 +28,13 @@
       <!-- MERON -->
       <div class="bg-red-900/40 p-6 rounded-xl border border-red-500/20 text-center">
         <h2 class="text-xl font-bold text-red-300">MERON</h2>
-        <p class="text-gray-300">{{ selectedFight.fightRTName.toUpperCase() }}</p>
+        <p class="text-gray-300">{{ selectedFight.fightLTName.toUpperCase() }}</p>
 
         <p class="mt-4 text-sm text-gray-400">TOTAL BETS</p>
-        <h1 class="text-2xl font-bold">{{ formatPeso(selectedFight.fightRTParada) }}</h1>
+        <h1 class="text-2xl font-bold">{{ formatPeso(selectedFight.fightLTParada) }}</h1>
 
         <p class="text-xs text-gray-400 mt-2">ODDS</p>
-        <p class="text-sm">{{ oddsMeron || '-' }}</p>
+        <!-- <p class="text-sm">{{ oddsMeron || '-' }}</p> -->
       </div>
 
       <!-- DRAW (NEW 🔥) -->
@@ -48,19 +48,19 @@
         </h1>
 
         <p class="text-xs text-gray-400 mt-2">ODDS</p>
-        <p class="text-sm">{{ oddsDraw || '-' }}</p>
+        <!-- <p class="text-sm">{{ oddsDraw || '-' }}</p> -->
       </div>
 
       <!-- WALA -->
       <div class="bg-blue-900/40 p-6 rounded-xl border border-blue-500/20 text-center">
         <h2 class="text-xl font-bold text-blue-300">WALA</h2>
-        <p class="text-gray-300">{{ selectedFight.fightLTName.toUpperCase() }}</p>
+        <p class="text-gray-300">{{ selectedFight.fightRTName.toUpperCase() }}</p>
 
         <p class="mt-4 text-sm text-gray-400">TOTAL BETS</p>
-        <h1 class="text-2xl font-bold">{{ formatPeso(selectedFight.fightLTParada) }}</h1>
+        <h1 class="text-2xl font-bold">{{ formatPeso(selectedFight.fightRTParada) }}</h1>
 
         <p class="text-xs text-gray-400 mt-2">ODDS</p>
-        <p class="text-sm">{{ oddsWala || '-' }}</p>
+        <!-- <p class="text-sm">{{ oddsWala || '-' }}</p> -->
       </div>
     </div>
 
@@ -119,31 +119,29 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onUnmounted } from 'vue'
 
 const selectedFight = ref(null)
 const offset = ref(0)
 let timerInterval = null
+let currentFightId = null
 
 const props = defineProps({
   fight: Object,
 })
 
-const emit = defineEmits(['selectOpenBetting'])
-
-const openBetting = (fightId) => {
-  emit('selectOpenBetting', fightId)
-}
-
+// synced server time
 const getServerNow = () => {
   return new Date(new Date().getTime() + offset.value)
 }
 
+// timer function
 const startTimer = () => {
   if (timerInterval) clearInterval(timerInterval)
 
   timerInterval = setInterval(() => {
     if (!selectedFight.value) return
+    if (!selectedFight.value.fightEnd) return
 
     const now = getServerNow()
     const end = new Date(selectedFight.value.fightEnd)
@@ -159,28 +157,82 @@ const startTimer = () => {
     const minutes = Math.floor(remaining / 1000 / 60)
     const seconds = Math.floor((remaining / 1000) % 60)
 
-    const formatted = String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0')
-
-    selectedFight.value.remainingTime = formatted
+    selectedFight.value.remainingTime =
+      String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0')
   }, 1000)
 }
 
+// watch fight changes
 watch(
   () => props.fight,
   (newFight) => {
-    if (newFight) {
-      selectedFight.value = {
-        ...newFight,
-        remainingTime: '00:00',
+    if (!newFight) return
+
+    selectedFight.value = {
+      ...newFight,
+      remainingTime: selectedFight.value?.remainingTime || '00:00',
+    }
+
+    if (
+      currentFightId === newFight.fightCode &&
+      selectedFight.value?.fightStatus === newFight.fightStatus
+    ) {
+      return
+    }
+
+    if (newFight.fightServerTime) {
+      const serverNow = new Date(newFight.fightServerTime)
+
+      const clientNow = new Date()
+
+      offset.value = serverNow - clientNow
+    }
+
+    // initial compute (instant display)
+    if (newFight.fightEnd && newFight.fightServerTime) {
+      const now = getServerNow()
+      const end = new Date(newFight.fightEnd)
+
+      const remaining = end - now
+
+      if (remaining > 0) {
+        const minutes = Math.floor(remaining / 1000 / 60)
+        console.log(minutes)
+
+        const seconds = Math.floor((remaining / 1000) % 60)
+
+        selectedFight.value.remainingTime =
+          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0')
+
+        const formattedTime =
+          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0')
+
+        console.log('Remaining Time:', formattedTime)
+
+        selectedFight.value.remainingTime = formattedTime
       }
+    }
+
+    // start timer only if active
+    if (newFight.fightStatus === 'BET OPEN' && newFight.fightEnd && newFight.fightServerTime) {
       startTimer()
     }
   },
-  { immediate: true },
+  { immediate: true, deep: true },
 )
 
-console.log(selectedFight.value)
-console.log(selectedFight.value?.fightEnd)
+// cleanup
+onUnmounted(() => {
+  if (timerInterval) clearInterval(timerInterval)
+})
+
+/* =========================
+   Submit Data
+========================= */
+const emit = defineEmits(['selectOpenBetting'])
+const openBetting = (fightId) => {
+  emit('selectOpenBetting', fightId)
+}
 
 const formatPeso = (num) => {
   return '₱ ' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
