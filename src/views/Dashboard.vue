@@ -169,9 +169,6 @@ const handleGameCreated = async (data) => {
   }
 }
 
-console.log(new Date('2026-04-14T07:54:10.227').toString())
-console.log(new Date('2026-04-14T07:54:10.227Z').toString())
-
 /* =========================
    Create Fight
 ========================= */
@@ -307,13 +304,15 @@ const updateFight = async (fightId) => {
 const formatDate = (iso) => {
   if (!iso) return ''
 
-  return new Date(iso).toLocaleString('en-PH', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  })
+  return new Date(iso + 'Z')
+    .toLocaleString('en-PH', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    })
+    .replace(' at ', ' ')
 }
 </script>

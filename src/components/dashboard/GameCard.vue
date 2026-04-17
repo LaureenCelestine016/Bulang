@@ -5,7 +5,7 @@
     <div>
       <p class="text-xl font-semibold">{{ game.gameDescription }}</p>
       <p class="text-sm text-gray-400 mt-1">
-        {{ new Date(game.registeredAt).toLocaleString() }}
+        {{ formatDate(game.registeredAt) }}
       </p>
       <span
         class="px-3 py-1 rounded-full text-xs mt-3 inline-block font-medium"
@@ -79,4 +79,19 @@ const statusClasses = computed(() => ({
 
 // Disable button if not PENDING
 const canStartGame = computed(() => normalizedStatus.value === 0)
+
+const formatDate = (iso) => {
+  if (!iso) return ''
+
+  return new Date(iso + 'Z')
+    .toLocaleString('en-PH', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    })
+    .replace(' at ', ' ')
+}
 </script>
