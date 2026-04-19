@@ -87,7 +87,12 @@
                 description="Please create a fight to start."
                 icon="🥊"
               />
-              <FightDetail v-else :fight="selectedFight" @select-open-betting="updateFight" />
+              <FightDetail
+                v-else
+                :fight="selectedFight"
+                @select-open-betting="updateFight"
+                @select-winner="updateWinner"
+              />
             </div>
 
             <!-- Right (same height as top only) -->
@@ -123,6 +128,7 @@ import {
   getFightsByGame,
   getFightDetail,
   updateFightStatus,
+  updateFightWinner,
 } from '@/services/api'
 import { useToast } from 'primevue/usetoast'
 import { ref } from 'vue'
@@ -289,6 +295,15 @@ const startGame = async (gameCode, status = null) => {
 const updateFight = async (fightId) => {
   try {
     const res = await updateFightStatus(selectedGame.value.gameCode, fightId, 1)
+    selectedFight.value = res
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+const updateWinner = async (status) => {
+  try {
+    const res = await updateFightWinner(selectedGame.value.gameCode, status)
 
     selectedFight.value = res
   } catch (err) {

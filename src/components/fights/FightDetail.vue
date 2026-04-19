@@ -90,28 +90,28 @@
       <p class="text-gray-400 mb-3 tracking-wide">DECLARE WINNER</p>
 
       <div class="flex gap-5 justify-center flex-wrap">
-        <!-- WALA WIN -->
+        <!-- MERON WIN -->
         <button
-          class="px-7 py-3 rounded-lg font-semibold text-white shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-blue-500/40 hover:brightness-110 active:scale-95"
-          @click="declareWinner('WALA')"
+          class="px-7 py-3 rounded-lg font-semibold text-white shadow-lg bg-gradient-to-r from-red-500 to-rose-600 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-red-500/40 hover:brightness-110 active:scale-95"
+          @click="declareWinner(selectedFight.fightCode, 'MERON')"
         >
-          🏆 WALA WINS
+          🏆 MERON WINS
         </button>
 
         <!-- DRAW WIN -->
         <button
           class="px-7 py-3 rounded-lg font-semibold text-white shadow-lg bg-gradient-to-r from-gray-500 to-gray-700 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-gray-400/40 hover:brightness-110 active:scale-95"
-          @click="declareWinner('DRAW')"
+          @click="declareWinner(selectedFight.fightCode, 'DRAW')"
         >
           🤝 DRAW
         </button>
 
-        <!-- MERON WIN -->
+        <!-- WALA WIN -->
         <button
-          class="px-7 py-3 rounded-lg font-semibold text-white shadow-lg bg-gradient-to-r from-red-500 to-rose-600 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-red-500/40 hover:brightness-110 active:scale-95"
-          @click="declareWinner('MERON')"
+          class="px-7 py-3 rounded-lg font-semibold text-white shadow-lg bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-300 ease-in-out hover:scale-105 hover:shadow-blue-500/40 hover:brightness-110 active:scale-95"
+          @click="declareWinner(selectedFight.fightCode, 'WALA')"
         >
-          🏆 MERON WINS
+          🏆 WALA WINS
         </button>
       </div>
     </div>
@@ -203,13 +203,6 @@ watch(
 
         selectedFight.value.remainingTime =
           String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0')
-
-        const formattedTime =
-          String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0')
-
-        console.log('Remaining Time:', formattedTime)
-
-        selectedFight.value.remainingTime = formattedTime
       }
     }
 
@@ -227,13 +220,20 @@ onUnmounted(() => {
 })
 
 /* =========================
-   Submit Data
+   Submit Status
 ========================= */
-const emit = defineEmits(['selectOpenBetting'])
+const emit = defineEmits(['selectOpenBetting', 'selectWinner'])
+
 const openBetting = (fightId) => {
   emit('selectOpenBetting', fightId)
 }
 
+const declareWinner = (fightId, status) => {
+  emit('selectWinner', { fightId, status })
+}
+/* =========================
+   Format Currency
+========================= */
 const formatPeso = (num) => {
   return '₱ ' + num.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')
 }

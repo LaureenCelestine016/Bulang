@@ -96,12 +96,14 @@ const formatDate = (date) => {
 }
 
 const statusClass = (status) => {
+  console.log(status)
+
   switch (status) {
-    case 'Pending':
+    case 'BET OPEN':
       return 'bg-yellow-500/20 text-yellow-400'
-    case 'Ongoing':
+    case 'BET CLOSED':
       return 'bg-green-500/20 text-green-400'
-    case 'Finished':
+    case 'FINISHED':
       return 'bg-red-500/20 text-red-400'
     default:
       return 'bg-gray-500/20 text-gray-400'

@@ -104,4 +104,14 @@ export const updateFightStatus = async (gameId, fightId, status) => {
   }
 }
 
+export const updateFightWinner = async (gameId, fightIdStatus) => {
+  const { fightId, status } = fightIdStatus
+  try {
+    const res = await api.patch(`/games/${gameId}/fights/${fightId}`, { fightResult: status })
+    return res.data
+  } catch (err) {
+    console.error(err)
+  }
+}
+
 export default api
